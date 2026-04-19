@@ -22,6 +22,11 @@ def get_audio_url():
             'quiet': True,
             'no_warnings': True,
             'extract_flat': False,
+            'extractor_args': {
+                'youtube': {
+                    'player_client': ['ios'],  # iOS client bypasses bot detection
+                }
+            },
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
