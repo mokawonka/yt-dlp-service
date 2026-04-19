@@ -1,0 +1,26 @@
+name: Update yt-dlp
+
+on:
+  schedule:
+    - cron: '0 3 * * 1'  # every Monday at 3am
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Update yt-dlp version
+        run: |
+          latest=$(pip index versions yt-dlp 2>/dev/null | grep -oP '(?<=yt-dlp \()[\d.]+' | head -1)
+          echo "Latest yt-dlp version: $latest"
+          sed -i "s/yt-dlp==.*/yt-dlp==$latest/" requirements.txt
+          
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add requirements.txt
+          git diff --staged --quiet || git commit -m "chore: update yt-dlp to $latest"
+          git push
